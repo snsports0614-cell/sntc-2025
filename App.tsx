@@ -12,6 +12,8 @@ import LocationSection from './components/LocationSection';
 import Footer from './components/Footer';
 import Button from './components/Button';
 import InquiryModal from './components/InquiryModal';
+import ContactFAB from './components/ContactFAB';
+import StickyMobileNav from './components/StickyMobileNav';
 import { InquiryRecord, InquiryType } from './types';
 
 const App: React.FC = () => {
@@ -58,22 +60,8 @@ const App: React.FC = () => {
     }
   };
 
-  const clearAllInquiries = () => {
-    if (!confirm('모든 문의 내역을 초기화하시겠습니까?')) return;
-    localStorage.removeItem('sn_inquiries');
-    setInquiries([]);
-  };
-
-  // 통계 계산
-  const stats = {
-    total: inquiries.length,
-    lesson: inquiries.filter(i => i.type === InquiryType.LESSON).length,
-    fc: inquiries.filter(i => i.type === InquiryType.FC_TEST).length,
-    ai: inquiries.filter(i => i.isAiRecommendation).length
-  };
-
   return (
-    <div className="font-sans antialiased bg-dark-bg text-white overflow-x-hidden selection:bg-gold selection:text-black">
+    <div className="font-sans antialiased bg-dark-bg text-white overflow-x-hidden selection:bg-gold selection:text-black pb-20 md:pb-0">
       <Header onOpenModal={openModal} />
       
       <main>
@@ -99,74 +87,32 @@ const App: React.FC = () => {
 
         <div ref={adminSectionRef}>
           {isAdminMode && (
-            <section className="py-24 bg-[#050505] border-t-4 border-gold animate-in slide-in-from-bottom-10 duration-700">
+            <section className="py-24 bg-[#050505] border-t-4 border-gold">
               <div className="container mx-auto px-6">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-                  <div>
-                    <h2 className="text-4xl font-oswald font-bold text-gold uppercase tracking-tight">Inquiry Dashboard</h2>
-                    <p className="text-gray-500 mt-2">관리자 전용: 접수된 실시간 문의 내역입니다.</p>
-                  </div>
-                  <div className="flex gap-4">
-                    <Button onClick={clearAllInquiries} variant="outline" className="text-xs py-2 px-6 border-red-900/30 text-red-500 hover:bg-red-500/10">Clear All</Button>
-                    <Button onClick={() => setIsAdminMode(false)} variant="outline" className="text-xs py-2 px-6">Logout</Button>
-                  </div>
-                </div>
-
-                {/* Dashboard Stats Summary */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-                  <div className="bg-[#111] p-4 border border-white/5 rounded">
-                    <div className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total</div>
-                    <div className="text-2xl font-oswald font-bold text-white">{stats.total}</div>
-                  </div>
-                  <div className="bg-[#111] p-4 border border-white/5 rounded">
-                    <div className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Lesson</div>
-                    <div className="text-2xl font-oswald font-bold text-gold">{stats.lesson}</div>
-                  </div>
-                  <div className="bg-[#111] p-4 border border-white/5 rounded">
-                    <div className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">FC Test</div>
-                    <div className="text-2xl font-oswald font-bold text-gold">{stats.fc}</div>
-                  </div>
-                  <div className="bg-[#111] p-4 border border-white/5 rounded">
-                    <div className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">AI Consult</div>
-                    <div className="text-2xl font-oswald font-bold text-blue-400">{stats.ai}</div>
-                  </div>
+                  <h2 className="text-4xl font-oswald font-bold text-gold uppercase tracking-tight">Inquiry Dashboard</h2>
+                  <Button onClick={() => setIsAdminMode(false)} variant="outline" className="text-xs py-2 px-6">Logout</Button>
                 </div>
                 
                 {inquiries.length === 0 ? (
                   <div className="text-center py-32 text-gray-700 border border-dashed border-gray-900 rounded-lg">
-                    <i className="fas fa-inbox text-5xl mb-4 block opacity-20"></i>
-                    현재 접수된 문의 내역이 없습니다.
+                    접수된 문의 내역이 없습니다.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-4">
                     {inquiries.map((inv) => (
-                      <div key={inv.id} className={`p-6 bg-[#0d0d0d] border ${inv.isAiRecommendation ? 'border-gold/30' : 'border-gray-800'} rounded-sm hover:border-gold/50 transition-colors group relative`}>
-                        <div className="flex flex-col md:flex-row justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="text-xs text-gray-500 font-mono">{inv.date}</span>
-                              <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold ${inv.isAiRecommendation ? 'bg-gold text-black' : 'bg-gray-800 text-gray-400'}`}>
-                                {inv.type}
-                              </span>
-                            </div>
-                            <div className="flex items-baseline gap-4 mb-4">
-                              <h3 className="text-xl font-bold text-white">{inv.name}</h3>
-                              <span className="text-gold font-oswald tracking-widest">{inv.phone}</span>
-                            </div>
-                            <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap bg-black/40 p-4 rounded border border-white/5">
-                              {inv.message}
-                            </p>
+                      <div key={inv.id} className="p-6 bg-[#0d0d0d] border border-gray-800 rounded-sm hover:border-gold/50 transition-colors">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <span className="text-xs text-gray-500 font-mono block mb-1">{inv.date}</span>
+                            <h3 className="text-xl font-bold text-white">{inv.name} ({inv.phone})</h3>
+                            <span className="inline-block bg-gold/10 text-gold text-[10px] px-2 py-0.5 mt-2 font-bold uppercase tracking-widest">{inv.type}</span>
                           </div>
-                          <div className="flex flex-col justify-between items-end">
-                            <button 
-                              onClick={() => deleteInquiry(inv.id)} 
-                              className="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all"
-                              title="삭제"
-                            >
-                              <i className="fas fa-trash-alt"></i>
-                            </button>
-                          </div>
+                          <button onClick={() => deleteInquiry(inv.id)} className="text-gray-700 hover:text-red-500 transition-colors">
+                            <i className="fas fa-trash-alt"></i>
+                          </button>
                         </div>
+                        <p className="text-gray-400 text-sm whitespace-pre-wrap bg-black/40 p-4 rounded">{inv.message}</p>
                       </div>
                     ))}
                   </div>
@@ -178,32 +124,27 @@ const App: React.FC = () => {
       </main>
 
       <Footer onAdminClick={() => setIsAuthModalOpen(true)} />
+      <ContactFAB />
+      <StickyMobileNav onOpenModal={openModal} />
 
       <InquiryModal isOpen={modalState.isOpen} onClose={closeModal} initialType={modalState.type} />
 
-      {/* 관리자 인증 커스텀 모달 */}
       {isAuthModalOpen && (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6">
-          <div className="fixed inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setIsAuthModalOpen(false)} />
-          <div className="relative bg-black border border-gold/30 p-8 md:p-12 w-full max-w-md shadow-2xl shadow-gold/10">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl">
+          <div className="relative bg-black border border-gold/30 p-8 w-full max-w-md">
             <h3 className="text-2xl font-oswald font-bold text-gold text-center mb-8 uppercase tracking-widest">Admin Access</h3>
             <form onSubmit={handleAdminAuth} className="space-y-6">
               <input 
                 type="password" 
                 placeholder="PASSWORD" 
-                className="w-full bg-[#111] border border-white/10 p-4 text-center text-white tracking-[0.5em] focus:outline-none focus:border-gold transition-all"
+                className="w-full bg-[#111] border border-white/10 p-4 text-center text-white focus:outline-none focus:border-gold"
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
                 autoFocus
               />
-              <Button type="submit" className="w-full">Unlock Dashboard</Button>
+              <Button type="submit" className="w-full">Login</Button>
             </form>
-            <button 
-              className="mt-6 w-full text-xs text-gray-600 uppercase tracking-widest hover:text-white transition-colors"
-              onClick={() => setIsAuthModalOpen(false)}
-            >
-              Cancel
-            </button>
+            <button className="mt-6 w-full text-xs text-gray-600 hover:text-white" onClick={() => setIsAuthModalOpen(false)}>Cancel</button>
           </div>
         </div>
       )}
